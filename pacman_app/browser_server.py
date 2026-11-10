@@ -178,7 +178,11 @@ def make_server(host, port, mode="play", maze="classic", heuristic="manhattan", 
             except Exception as exc:
                 self.reply({"error": f"The game could not finish: {exc}"}, 500)
 
-    server = ThreadingHTTPServer((host, port), Handler)
+    class Server(ThreadingHTTPServer):
+        # On Windows, address reuse lets two servers share a port silently.
+        allow_reuse_address = os.name != "nt"
+
+    server = Server((host, port), Handler)
     server.daemon_threads = True
     return server
 

@@ -65,6 +65,11 @@ def open_browser_game(args, mode, maze, heuristic):
 
 
 def main(argv=None):
+    for stream in (sys.stdout, sys.stderr):
+        try:  # Some Windows terminals cannot print every character.
+            stream.reconfigure(errors="replace")
+        except (AttributeError, ValueError):
+            pass
     p = parser()
     args = p.parse_args(argv)
     if sys.version_info < (3, 10):

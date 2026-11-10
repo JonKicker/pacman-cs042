@@ -29,6 +29,8 @@ Choose **Play yourself → New game**. Use arrow keys or WASD. Keep the terminal
 
 **If `py` is not recognized:** replace `py -3` with `python` in both commands. If neither works, finish installing Python, close and reopen VS Code, and try again. Check the version with `py -3 --version` or `python --version`.
 
+**If install says it could not download:** run the install command again (it retries automatically). On school Wi-Fi or behind a firewall, open [Berkeley's search.zip](https://inst.eecs.berkeley.edu/~cs188/sp26/assets/projects/search.zip) in your web browser, move the downloaded `search.zip` (or the unzipped `search` folder) into this project folder next to `start_pacman.py`, and run the install command again. No internet is needed after that.
+
 ## 4. Try AI help
 
 Open Copilot Chat in VS Code, sign in if requested, and choose **Agent** mode so it can edit files and run commands. Your Copilot access depends on your account.

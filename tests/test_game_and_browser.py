@@ -52,6 +52,32 @@ class SetupTests(unittest.TestCase):
             self.assertFalse((Path(directory) / "escape.py").exists())
 
 
+    def test_download_falls_back_to_curl_and_retries(self):
+        cert_error = urllib.error.URLError(bootstrap.ssl.SSLCertVerificationError("no certificates"))
+        with patch.object(bootstrap, "_download_with_python", side_effect=cert_error), \
+             patch.object(bootstrap, "_download_with_curl", side_effect=[OSError("offline"), b"zip"]), \
+             patch.object(bootstrap.time, "sleep"):
+            self.assertEqual(bootstrap.download(), b"zip")
+
+    def test_failed_download_explains_browser_fallback(self):
+        with patch.object(bootstrap, "_download_with_python", side_effect=OSError("offline")), \
+             patch.object(bootstrap, "_download_with_curl", side_effect=OSError("offline")), \
+             patch.object(bootstrap.time, "sleep"):
+            with self.assertRaisesRegex(ValueError, "web browser.*search.zip"):
+                bootstrap.download()
+
+    def test_local_zip_installs_without_internet(self):
+        data = self.archive()
+        with tempfile.TemporaryDirectory() as directory, patch.object(bootstrap, "SHA256", hashlib.sha256(data).hexdigest()):
+            root = Path(directory)
+            (root / "search.zip").write_bytes(data)
+            with patch.object(bootstrap, "ROOT", root), patch.object(bootstrap, "ENGINE", root / "engine"), \
+                 patch.object(bootstrap, "LOCAL_ZIPS", (root / "search.zip",)), \
+                 patch.object(bootstrap, "download", side_effect=AssertionError("no download expected")):
+                bootstrap.ensure_engine(quiet=True)
+            self.assertTrue((root / "engine" / "search.py").is_file())
+
+
 class EngineTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
