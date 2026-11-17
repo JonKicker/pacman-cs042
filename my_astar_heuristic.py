@@ -4,9 +4,11 @@
 def estimate(position, goal):
     """Estimate remaining travel cost; coordinates are (x, y), bottom-left origin.
 
-    The starter is Manhattan distance: horizontal steps + vertical steps.
-    Each step in our search mazes costs at least 1, so this never overestimates.
+    My idea: "guess that the food is twice as far away as it looks."
+    Take the horizontal steps + vertical steps (ignoring walls), then double it.
+    Doubling makes A* rush toward the goal, but it CAN overestimate the real
+    cost, so A* is no longer guaranteed to find the cheapest route.
     """
     x, y = position
     goal_x, goal_y = goal
-    return abs(x - goal_x) + abs(y - goal_y)
+    return 2 * (abs(x - goal_x) + abs(y - goal_y))
